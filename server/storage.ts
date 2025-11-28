@@ -1,6 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { 
   users, 
   workouts, 
@@ -21,10 +20,8 @@ import {
 } from "@shared/schema";
 import { eq, desc, and, gte, lte } from "drizzle-orm";
 
-neonConfig.webSocketConstructor = ws;
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const db = drizzle(pool);
+const queryClient = postgres(process.env.DATABASE_URL!);
+const db = drizzle(queryClient);
 
 export interface IStorage {
   // Users (Replit Auth required methods)
