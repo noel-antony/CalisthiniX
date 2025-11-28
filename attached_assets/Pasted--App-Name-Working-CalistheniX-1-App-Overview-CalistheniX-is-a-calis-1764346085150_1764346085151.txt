@@ -1,0 +1,220 @@
+# 🏋️‍♂️ **App Name (Working): CalistheniX**
+
+---
+
+# ⭐ **1. App Overview**
+
+CalistheniX is a **calisthenics-focused fitness mobile app** built for beginners to advanced athletes.
+It combines **AI-powered coaching**, **video form analysis**, **personalized routines**, and a **Duolingo-style streak system**.
+
+The app’s goal:
+**Help users progress from zero pull-ups → muscle-ups, handstands, and strong fundamentals.**
+
+---
+
+# ⭐ **2. Core Features (Detailed Explanation)**
+
+---
+
+## **2.1 Calisthenics Roadmap (Beginner → Advanced)**
+
+A structured, gamified roadmap divided into levels:
+
+* **Level 0 – Absolute Beginner**
+  Wall pushups, dead hangs, assisted squats, knee raises.
+
+* **Level 1 – Beginner**
+  Pushups, rows, dips, hollow holds, leg raises progressions.
+
+* **Level 2 – Intermediate**
+  Pull-ups, dips, pistol squat progression, L-sit basics.
+
+* **Level 3 – Advanced**
+  Muscle-up drills, handstand progression, front lever tucks.
+
+* **Level 4 – Skills Zone**
+  Handstand hold, back lever, front lever, planche basics.
+
+Each progression shows:
+
+* How to perform
+* Common mistakes
+* Recommended sets & reps
+* Required strength checkpoints
+
+---
+
+## **2.2 Sets & Reps Workout Tracker**
+
+Tracks every workout with:
+
+* exercise
+* sets
+* reps
+* RPE (difficulty rating)
+* notes
+* time spent
+
+Automatically generates:
+
+* weekly volume
+* PRs (personal records)
+* improvement graphs
+
+---
+
+## **2.3 AI Progress Analyzer**
+
+AI reads your last 30 workouts and identifies:
+
+* increasing or decreasing volume
+* weaknesses (grip, core, pushing imbalance)
+* deload recommendations
+* strength milestones crossed
+
+Example output:
+“Your pulling volume increased 18% this week but your pushing dropped 9%. Recommend adding 2 push sets on Day B.”
+
+Runs using Gemini API.
+
+---
+
+## **2.4 Daily Journal**
+
+Simple reflective interface:
+
+* mood slider
+* sleep hours
+* energy level
+* text notes
+* attach workout photos
+
+Stored locally + synced to cloud.
+
+---
+
+## **2.5 AI Form Checker**
+
+Upload or record your exercise video → app uses **MediaPipe Pose** to check:
+
+* elbow lockout
+* spine alignment
+* hip height
+* shoulder angle
+* knee tracking
+
+Feedback examples:
+
+* “Hips are sagging in pushups — tighten core.”
+* “Your pull-up ascent is uneven. Right arm compensating.”
+
+Runs on-device = fast.
+
+---
+
+## **2.6 Daily Streak System**
+
+Just like Duolingo:
+
+* log a workout → streak +1
+* missing a day → streak breaks
+* can add “Streak Freeze” item later
+
+Shows:
+
+* longest streak
+* current week
+* monthly consistency heatmap
+
+---
+
+## **2.7 Exercise Library**
+
+Over 100 calisthenics exercises:
+
+* progressions
+* regressions
+* GIF demo
+* instructions
+* joint safety notes
+* equipment needed (if any)
+
+Exercises organized by:
+
+* Push / Pull / Legs / Core
+* Skills (Handstand, L-sit, Planche)
+
+---
+
+## **2.8 AI Coach (Chat System)**
+
+You can ask:
+
+* “Make me a 4-day split.”
+* “Why can’t I increase pull-ups?”
+* “Give me a beginner handstand routine.”
+* “Correct this form.”
+
+AI uses:
+
+* exercise library
+* your past workouts
+* your roadmap level
+
+Gives customized routines and progression advice.
+
+---
+
+## **2.9 Workout Split Generator**
+
+User picks:
+
+* goal: strength / hypertrophy / fat loss / skills
+* available days
+* equipment (bars / rings / none)
+
+AI outputs a full 4–8 week plan:
+
+* Day A: Push + core
+* Day B: Pull + skill work
+* Day C: Legs + balance
+
+Automatically syncs with tracker.
+
+---
+
+# ⭐ **3. App Architecture (Short & Practical)**
+
+### **Frontend**
+
+* **Flutter**
+* Clean UI, animations, fast dev
+
+### **Backend**
+
+* **Firebase Auth** – login
+* **Firestore** – workouts, journal, roadmap
+* **Cloud Storage** – video uploads
+* **Firebase Functions** – AI routing
+
+### **AI**
+
+* **Gemini API**
+* **MediaPipe** for pose detection
+
+---
+
+# ⭐ **4. Target Users**
+
+* beginners who want a roadmap
+* intermediates wanting skills like handstand/muscle-up
+* people who prefer bodyweight workouts
+* anyone who wants an AI coach instead of a trainer
+
+---
+
+# ⭐ **5. One-Liner Summary**
+
+**A complete AI-powered calisthenics coach in your pocket — training plans, form check, progress tracking, streaks, and skill roadmaps all in one app.**
+
+---
