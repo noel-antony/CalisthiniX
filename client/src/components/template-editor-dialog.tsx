@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Plus,
   Trash2,
@@ -218,8 +217,8 @@ export function TemplateEditorDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {isEditing ? "Edit Template" : "Create Template"}
             </DialogTitle>
@@ -230,7 +229,7 @@ export function TemplateEditorDialog({
               <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <ScrollArea className="flex-1 -mx-6 px-6">
+            <div className="flex-1 min-h-0 overflow-y-auto -mx-6 px-6">
               <div className="space-y-6 pb-4">
                 {/* Basic Info */}
                 <div className="space-y-4">
@@ -439,10 +438,10 @@ export function TemplateEditorDialog({
                   )}
                 </div>
               </div>
-            </ScrollArea>
+            </div>
           )}
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 flex-shrink-0 pt-4 border-t">
             <Button
               type="button"
               variant="outline"

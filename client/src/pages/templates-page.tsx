@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { TemplateEditorDialog } from "@/components/template-editor-dialog";
+import { TemplatePreviewDialog } from "@/components/template-preview-dialog";
 import {
   Plus,
   Play,
@@ -43,6 +44,7 @@ import {
   Copy,
   Sparkles,
   User,
+  Eye,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -78,6 +80,7 @@ export default function TemplatesPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [startingTemplateId, setStartingTemplateId] = useState<string | null>(null);
   const [duplicatingTemplateId, setDuplicatingTemplateId] = useState<string | null>(null);
+  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(null);
 
   // Filter and separate templates
   const { recommendedTemplates, myTemplates } = useMemo(() => {
@@ -129,15 +132,17 @@ export default function TemplatesPage() {
     setStartingTemplateId(templateId);
     try {
       const result = await startWorkout.mutateAsync(templateId);
+      setPreviewTemplateId(null); // Close preview if open
       toast({
         title: "Workout started!",
         description: "Your workout has been created from the template.",
       });
       navigate(`/workout`);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Start workout error:", error);
       toast({
         title: "Error",
-        description: "Failed to start workout from template.",
+        description: error?.message || "Failed to start workout from template.",
         variant: "destructive",
       });
     } finally {
@@ -156,10 +161,11 @@ export default function TemplatesPage() {
       // Open editor for the new template
       setEditingTemplate(newTemplate);
       setIsEditorOpen(true);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Duplicate template error:", error);
       toast({
         title: "Error",
-        description: "Failed to duplicate template.",
+        description: error?.message || "Failed to duplicate template.",
         variant: "destructive",
       });
     } finally {
@@ -242,6 +248,14 @@ export default function TemplatesPage() {
           {template.exerciseCount} exercise{template.exerciseCount !== 1 ? "s" : ""}
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setPreviewTemplateId(template.id)}
+            title="Preview template"
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
           <Button
             onClick={() => handleStartWorkout(template.id)}
             disabled={startingTemplateId === template.id}
@@ -449,6 +463,15 @@ export default function TemplatesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Preview Dialog */}
+      <TemplatePreviewDialog
+        open={!!previewTemplateId}
+        onOpenChange={(open) => !open && setPreviewTemplateId(null)}
+        templateId={previewTemplateId}
+        onStart={() => previewTemplateId && handleStartWorkout(previewTemplateId)}
+        isStarting={!!startingTemplateId}
+      />
     </div>
   );
 }
