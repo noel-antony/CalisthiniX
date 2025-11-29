@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Map, Dumbbell, MessageSquare, User, Menu, LogOut } from "lucide-react";
+import { Home, Map, Dumbbell, MessageSquare, User, Menu, LogOut, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -13,6 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { href: "/", icon: Home, label: "Home" },
     { href: "/roadmap", icon: Map, label: "Roadmap" },
     { href: "/workout", icon: Dumbbell, label: "Workout" },
+    { href: "/exercises", icon: ListChecks, label: "Exercises" },
     { href: "/coach", icon: MessageSquare, label: "Coach" },
     { href: "/profile", icon: User, label: "Profile" },
   ];
@@ -81,7 +82,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               CALISTHENI<span className="text-primary">X</span>
             </span>
           </div>
-          
+
           {/* Mobile Menu Sheet */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
@@ -91,12 +92,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </SheetTrigger>
             <SheetContent side="right" className="bg-sidebar border-sidebar-border text-foreground">
               <div className="flex flex-col gap-4 mt-8">
-                 <a href="/api/logout">
-                   <Button variant="outline" className="w-full justify-start">
-                     <LogOut className="w-4 h-4 mr-2" />
-                     Sign Out
-                   </Button>
-                 </a>
+                <a href="/api/logout">
+                  <Button variant="outline" className="w-full justify-start">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </a>
               </div>
             </SheetContent>
           </Sheet>
