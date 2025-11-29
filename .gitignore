@@ -108,7 +108,6 @@ ehthumbs.db
 Desktop.ini
 
 # Logs
-logs
 *.log
 
 # Build outputs
@@ -136,7 +135,5 @@ playwright/.cache/
 # Local development
 .local
 
-#images
-*.png
-*.jpg
-*.jpeg
+#uploaded files
+uploads/

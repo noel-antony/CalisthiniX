@@ -66,6 +66,34 @@ async function setup() {
       console.log('🌱 Seeding database with initial data...');
       const seedPath = path.join(__dirname, 'seed.sql');
       await sql.file(seedPath);
+
+      // Create a default user for development
+      console.log('   Creating default user and mock history...');
+      const [user] = await sql`
+        INSERT INTO users (id, email, display_name, first_name, last_name, current_level, level_progress, streak, weight)
+        VALUES ('user-123', 'demo@example.com', 'Demo Athlete', 'Demo', 'User', 2, 35, 5, 75)
+        ON CONFLICT (id) DO UPDATE SET 
+          display_name = EXCLUDED.display_name,
+          current_level = EXCLUDED.current_level
+        RETURNING id
+      `;
+
+      // Create a past workout
+      const [workout] = await sql`
+        INSERT INTO workouts (user_id, name, date, duration, total_volume, notes)
+        VALUES (${user.id}, 'Full Body Blast', NOW() - INTERVAL '2 days', 2700, 4500, 'Felt great, increased reps on pull-ups.')
+        RETURNING id
+      `;
+
+      // Add exercises to that workout
+      await sql`
+        INSERT INTO exercises (workout_id, name, sets, "order")
+        VALUES 
+        (${workout.id}, 'Push-up', '[{"reps": 20, "rpe": 7, "completed": true}, {"reps": 15, "rpe": 8, "completed": true}, {"reps": 12, "rpe": 9, "completed": true}]'::jsonb, 0),
+        (${workout.id}, 'Pull-up', '[{"reps": 10, "rpe": 8, "completed": true}, {"reps": 8, "rpe": 9, "completed": true}, {"reps": 6, "rpe": 9, "completed": true}]'::jsonb, 1),
+        (${workout.id}, 'Squat', '[{"reps": 25, "rpe": 6, "completed": true}, {"reps": 25, "rpe": 7, "completed": true}]'::jsonb, 2)
+      `;
+
       console.log('   ✓ Seed data inserted successfully\n');
     }
 

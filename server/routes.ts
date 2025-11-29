@@ -225,9 +225,10 @@ export async function registerRoutes(
   // Create workout
   app.post("/api/workouts", isAuthenticated, async (req: any, res) => {
     const userId = getUserId(req);
+    const { exercises: exercisesData, ...workoutData } = req.body;
 
     const result = insertWorkoutSchema.safeParse({
-      ...req.body,
+      ...workoutData,
       userId,
     });
 
@@ -235,31 +236,51 @@ export async function registerRoutes(
       return res.status(400).json({ error: fromZodError(result.error).message });
     }
 
-    const workout = await storage.createWorkout(result.data);
+    try {
+      const workout = await storage.createWorkout(result.data);
 
-    // Update user streak
-    const user = await storage.getUser(userId);
-    if (user) {
-      const today = new Date();
-      const lastWorkout = user.lastWorkoutDate ? new Date(user.lastWorkoutDate) : null;
-
-      let newStreak = user.streak;
-      if (lastWorkout) {
-        const daysSince = Math.floor((today.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60 * 24));
-        if (daysSince === 1) {
-          newStreak += 1; // Consecutive day
-        } else if (daysSince > 1) {
-          newStreak = 1; // Streak broken, start new
+      if (exercisesData && Array.isArray(exercisesData)) {
+        for (const ex of exercisesData) {
+          await storage.createExercise({
+            workoutId: workout.id,
+            name: ex.name,
+            sets: ex.sets,
+            order: ex.order || 0,
+          });
         }
-        // Same day workout doesn't change streak
-      } else {
-        newStreak = 1; // First workout
       }
 
-      await storage.updateUserStreak(userId, newStreak, today);
-    }
+      // Update user streak
+      const user = await storage.getUser(userId);
+      if (user) {
+        const today = new Date();
+        const lastWorkout = user.lastWorkoutDate ? new Date(user.lastWorkoutDate) : null;
 
-    res.status(201).json(workout);
+        let newStreak = user.streak;
+        if (lastWorkout) {
+          const daysSince = Math.floor((today.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysSince === 1) {
+            newStreak += 1; // Consecutive day
+          } else if (daysSince > 1) {
+            newStreak = 1; // Streak broken, start new
+          }
+          // Same day workout doesn't change streak
+        } else {
+          newStreak = 1; // First workout
+        }
+
+        await storage.updateUserStreak(userId, newStreak, today);
+      }
+
+      // Return the full workout with exercises
+      const fullWorkout = await storage.getWorkout(workout.id);
+      const exercises = await storage.getExercisesByWorkout(workout.id);
+      
+      res.status(201).json({ ...fullWorkout, exercises });
+    } catch (error) {
+      console.error("Error creating workout:", error);
+      res.status(500).json({ error: "Failed to create workout" });
+    }
   });
 
   // Update workout
@@ -864,7 +885,8 @@ export async function registerRoutes(
         const setsArray = Array.from({ length: defaultSetsCount }, () => ({
           reps: defaultRepsCount,
           weight: 0,
-          rpe: 7
+          rpe: 7,
+          completed: false
         }));
 
         await storage.createExercise({

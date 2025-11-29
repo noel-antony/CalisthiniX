@@ -79,7 +79,7 @@ export interface StartWorkoutResult {
     id: number;
     workoutId: number;
     name: string;
-    sets: Array<{ reps: number; weight?: number; rpe: number }>;
+    sets: Array<{ reps: number; weight?: number; rpe: number; completed: boolean }>;
     order: number;
   }>;
 }
