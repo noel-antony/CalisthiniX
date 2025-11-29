@@ -10,8 +10,18 @@ export function useJournal() {
   });
 
   const createEntry = useMutation({
-    mutationFn: async (entry: InsertJournalEntry) => {
-      const res = await apiRequest("POST", "/api/journal", entry);
+    mutationFn: async (formData: FormData) => {
+      const res = await fetch("/api/journal", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`${res.status}: ${text}`);
+      }
+      
       return res.json();
     },
     onSuccess: () => {
