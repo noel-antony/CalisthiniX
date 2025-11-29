@@ -9,6 +9,8 @@ import Workout from "@/pages/workout";
 import Coach from "@/pages/coach";
 import Profile from "@/pages/profile";
 import Landing from "@/pages/landing";
+import ExercisesPage from "@/pages/exercises-page";
+import ExerciseDetailPage from "@/pages/exercise-detail-page";
 import Layout from "@/components/layout";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -43,6 +45,8 @@ function Router() {
         <Route path="/workout" component={Workout} />
         <Route path="/coach" component={Coach} />
         <Route path="/profile" component={Profile} />
+        <Route path="/exercises" component={ExercisesPage} />
+        <Route path="/exercises/:slug" component={ExerciseDetailPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
