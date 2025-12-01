@@ -11,6 +11,7 @@ import {
   updateUserProfileSchema
 } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+import { registerCoachRoutes } from "./ai/coachRoutes";
 
 // Helper function to get userId from request (works with both local auth and replit auth)
 function getUserId(req: any): string {
@@ -100,6 +101,9 @@ export async function registerRoutes(
 
   // Setup Local Auth (for development)
   setupLocalAuth(app);
+
+  // Register AI Coach routes
+  registerCoachRoutes(app);
 
   // Auth route - get current user
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
