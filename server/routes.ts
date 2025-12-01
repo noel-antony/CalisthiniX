@@ -466,16 +466,13 @@ export async function registerRoutes(
     res.json(weeklyData);
   });
 
-  // Get profile stats (total workouts, active minutes, current streak, favorite workout)
+  // Get profile stats (total workouts, active minutes, current streak, favorite workout, PR)
   app.get("/api/stats/profile", isAuthenticated, async (req: any, res) => {
     try {
       const userId = getUserId(req);
       
-      // Get all workouts for stats calculation
+      // Get all workouts for stats calculation (with exercises)
       const workouts = await storage.getWorkouts(userId, 1000);
-      
-      // Get user for streak info
-      const user = await storage.getUser(userId);
       
       // Calculate total workouts
       const totalWorkouts = workouts.length;
@@ -489,8 +486,46 @@ export async function registerRoutes(
         ? `${activeHours}h ${activeMinutes}m` 
         : `${activeMinutes}m`;
       
-      // Get current streak from user
-      const currentStreak = user?.streak || 0;
+      // Calculate streak from workout dates
+      let currentStreak = 0;
+      if (workouts.length > 0) {
+        // Sort workouts by date descending
+        const sortedWorkouts = [...workouts].sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
+        // Get unique dates (one workout per day counts)
+        const uniqueDates = [...new Set(sortedWorkouts.map(w => 
+          new Date(w.date).toDateString()
+        ))];
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // Check if most recent workout was today or yesterday
+        const mostRecentDate = new Date(uniqueDates[0]);
+        mostRecentDate.setHours(0, 0, 0, 0);
+        
+        if (mostRecentDate.getTime() === today.getTime() || mostRecentDate.getTime() === yesterday.getTime()) {
+          currentStreak = 1;
+          let checkDate = new Date(mostRecentDate);
+          checkDate.setDate(checkDate.getDate() - 1);
+          
+          for (let i = 1; i < uniqueDates.length; i++) {
+            const workoutDate = new Date(uniqueDates[i]);
+            workoutDate.setHours(0, 0, 0, 0);
+            
+            if (workoutDate.getTime() === checkDate.getTime()) {
+              currentStreak++;
+              checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+              break;
+            }
+          }
+        }
+      }
       
       // Calculate favorite workout (most frequent workout name)
       const workoutNameCounts = workouts.reduce((acc: Record<string, number>, w) => {
@@ -508,12 +543,29 @@ export async function registerRoutes(
         }
       }
       
+      // Calculate PR (highest weight from all exercises)
+      let pr = { exerciseName: "None yet", weight: 0 };
+      for (const workout of workouts) {
+        // Fetch exercises for this workout
+        const exercises = await storage.getExercisesByWorkout(workout.id);
+        for (const exercise of exercises) {
+          if (Array.isArray(exercise.sets)) {
+            for (const set of exercise.sets) {
+              if (set.weight && set.weight > pr.weight) {
+                pr = { exerciseName: exercise.name, weight: set.weight };
+              }
+            }
+          }
+        }
+      }
+      
       res.json({
         totalWorkouts,
         activeTime: activeTimeFormatted,
         activeMinutes: totalActiveMinutes,
         currentStreak,
-        favoriteWorkout
+        favoriteWorkout,
+        pr
       });
     } catch (error: any) {
       console.error("Error fetching profile stats:", error?.message);
@@ -522,7 +574,8 @@ export async function registerRoutes(
         activeTime: "0m",
         activeMinutes: 0,
         currentStreak: 0,
-        favoriteWorkout: "None yet"
+        favoriteWorkout: "None yet",
+        pr: { exerciseName: "None yet", weight: 0 }
       });
     }
   });

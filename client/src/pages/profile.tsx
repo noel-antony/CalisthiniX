@@ -70,6 +70,10 @@ export default function Profile() {
     activeMinutes: number;
     currentStreak: number;
     favoriteWorkout: string;
+    pr: {
+      exercise: string;
+      weight: number;
+    } | null;
   }
 
   const { data: profileStats, isLoading: isLoadingStats } = useQuery<ProfileStats>({
@@ -155,11 +159,11 @@ export default function Profile() {
               </p>
               <div className="flex gap-3 justify-center md:justify-start">
                 <div className="text-center px-4 py-2 bg-card border border-border rounded-lg">
-                  <div className="text-xl font-bold text-primary font-mono">{user?.streak || 0}</div>
+                  <div className="text-xl font-bold text-primary font-mono">{profileStats?.currentStreak || 0}</div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Streak</div>
                 </div>
                 <div className="text-center px-4 py-2 bg-card border border-border rounded-lg">
-                  <div className="text-xl font-bold text-foreground font-mono">{user?.workoutCount || 0}</div>
+                  <div className="text-xl font-bold text-foreground font-mono">{profileStats?.totalWorkouts || 0}</div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Workouts</div>
                 </div>
                 <div className="text-center px-4 py-2 bg-card border border-border rounded-lg">
