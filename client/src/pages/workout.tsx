@@ -43,13 +43,21 @@ export default function Workout() {
   const [selectedDayWorkout, setSelectedDayWorkout] = useState<any>(null);
 
   // Fetch all workouts for history calendar
-  const { data: allWorkouts } = useQuery<any[]>({
+  const { data: allWorkouts, refetch: refetchWorkouts } = useQuery<any[]>({
     queryKey: ["/api/workouts/history"],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/workouts?limit=100");
       return res.json();
-    }
+    },
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
+
+  // Refetch workouts when component mounts
+  useEffect(() => {
+    refetchWorkouts();
+  }, [refetchWorkouts]);
 
   // State to hold all workouts for a selected day (multiple workouts per day)
   const [selectedDayWorkouts, setSelectedDayWorkouts] = useState<any[]>([]);
