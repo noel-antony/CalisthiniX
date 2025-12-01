@@ -55,10 +55,10 @@ async function buildUserContext(userId: string): Promise<string> {
     if (workoutsResult.length > 0) {
       const workoutIds = workoutsResult.map((w: any) => w.id);
       const exercisesResult = await sql`
-        SELECT e.workout_id, e.exercise_name, e.sets, e.reps, e.weight, e.notes
+        SELECT e.workout_id, e.name, e.sets, e."order"
         FROM exercises e
         WHERE e.workout_id = ANY(${workoutIds})
-        ORDER BY e.workout_id, e.id
+        ORDER BY e.workout_id, e."order"
       `;
 
       // Group exercises by workout
@@ -70,9 +70,16 @@ async function buildUserContext(userId: string): Promise<string> {
 
       exercisesContext = workoutsResult.map((w: any) => {
         const exs = exercisesByWorkout[w.id] || [];
-        const exList = exs.map((e: any) => 
-          `  - ${e.exercise_name}: ${e.sets}x${e.reps}${e.weight ? ` @ ${e.weight}kg` : ""}`
-        ).join("\n");
+        const exList = exs.map((e: any) => {
+          // sets is a JSONB array like [{reps: 10, weight: 0, rpe: 7, completed: false}, ...]
+          const setsArr = e.sets || [];
+          const setCount = setsArr.length;
+          const avgReps = setsArr.length > 0 
+            ? Math.round(setsArr.reduce((sum: number, s: any) => sum + (s.reps || 0), 0) / setsArr.length)
+            : 0;
+          const weight = setsArr[0]?.weight || 0;
+          return `  - ${e.name}: ${setCount} sets x ${avgReps} reps${weight > 0 ? ` @ ${weight}kg` : ""}`;
+        }).join("\n");
         return `${w.name} (${new Date(w.date).toLocaleDateString()}): ${w.duration ? `${w.duration} min` : ""}${w.total_volume ? `, Volume: ${w.total_volume}` : ""}\n${exList}`;
       }).join("\n\n");
     }
