@@ -91,11 +91,13 @@ function WorkoutStartPanel() {
     },
   });
 
-  // Group workouts by date
+  // Group workouts by date - only completed workouts for calendar display
   const workoutsByDate = useMemo(() => {
     if (!allWorkouts) return new Map<string, any[]>();
     const map = new Map<string, any[]>();
-    allWorkouts.forEach(w => {
+    // Filter to only show completed workouts on calendar
+    const completedWorkouts = allWorkouts.filter(w => w.status === "completed" || w.completedAt);
+    completedWorkouts.forEach(w => {
       const dateKey = format(new Date(w.date), 'yyyy-MM-dd');
       if (!map.has(dateKey)) {
         map.set(dateKey, []);
@@ -103,6 +105,12 @@ function WorkoutStartPanel() {
       map.get(dateKey)!.push(w);
     });
     return map;
+  }, [allWorkouts]);
+
+  // Completed workouts for calendar component
+  const completedWorkouts = useMemo(() => {
+    if (!allWorkouts) return [];
+    return allWorkouts.filter(w => w.status === "completed" || w.completedAt);
   }, [allWorkouts]);
 
   // Handle date selection
@@ -303,7 +311,7 @@ function WorkoutStartPanel() {
                 </div>
               ) : (
                 <WorkoutCalendar
-                  workouts={allWorkouts || []}
+                  workouts={completedWorkouts}
                   selectedDate={selectedDate}
                   onDateSelect={handleDateSelect}
                 />
