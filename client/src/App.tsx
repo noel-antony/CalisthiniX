@@ -46,6 +46,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/roadmap" component={Roadmap} />
         <Route path="/workout" component={Workout} />
+        <Route path="/workout/:id" component={Workout} />
         <Route path="/coach" component={Coach} />
         <Route path="/profile" component={Profile} />
         <Route path="/templates" component={TemplatesPage} />
